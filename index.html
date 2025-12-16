@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartPark - Parking Reservation System</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <header class="topbar">
+    <div class="logo-block">
+      <img class="flash-logo" src="logo/flash.png" alt="flash icon" />
+      <div class="brand">
+        <h1>SMARTPARK</h1>
+        <small>Parking Reservation System</small>
+      </div>
+    </div>
+
+    <div class="counters">
+      <div class="cnt avail">
+        <span id="count-available">20</span>
+        <small>AVAILABLE</small>
+      </div>
+      <div class="cnt reserved">
+        <span id="count-reserved">0</span>
+        <small>RESERVED</small>
+      </div>
+      <div class="cnt queue">
+        <span id="count-queue">0</span>
+        <small>QUEUE</small>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-grid">
+
+    <div class="top-row">
+      <section class="panel parking-panel">
+        <div class="panel-title">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="filter: drop-shadow(0 0 8px rgba(0,240,255,0.6));">
+              <rect x="3" y="3" width="18" height="18" rx="4" stroke="currentColor" stroke-width="2" fill="none"/>
+              <text x="12" y="16" text-anchor="middle" fill="currentColor" font-size="12" font-weight="bold">P</text>
+            </svg>
+            PARKING LOT — ISOMETRIC VIEW
+          </div>
+
+          <div class="legend">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <div style="width: 16px; height: 16px; border-radius: 50%; background: #1eff7a; box-shadow: 0 0 10px rgba(30,255,122,0.5);"></div>
+              <span class="available-text">AVAILABLE</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <div style="width: 16px; height: 16px; border-radius: 50%; background: #ff4b4b; box-shadow: 0 0 10px rgba(255,75,75,0.5);"></div>
+              <span class="occupied-text">OCCUPIED</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="parking-grid" class="grid"></div>
+        <div class="hint">Click on reserved slots to view details • Green slots are available for booking</div>
+      </section>
+
+      <aside class="panel insert-panel">
+        <div class="panel-title">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" style="filter: drop-shadow(0 0 8px currentColor);">
+            <path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+          INSERT RESERVATION
+        </div>
+
+        <label>VEHICLE PLATE NUMBER</label>
+        <input id="plate-input" placeholder="e.g., ABC-1234" />
+
+        <label>SELECT PARKING SLOT</label>
+        <select id="slot-select">
+          <option value="auto">AUTO-ASSIGN (First Available)</option>
+        </select>
+
+        <button id="insert-btn" class="pink">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="display: inline-block; margin-right: 8px; vertical-align: middle;">
+            <path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span id="btn-text">INSERT TO ARRAYLIST</span>
+        </button>
+
+        <div class="slots-available" id="slots-status">
+          <span id="slots-available">20</span>
+          <div>SLOTS AVAILABLE</div>
+        </div>
+      </aside>
+    </div>
+
+    <div class="bottom-row">
+      <div class="left-column">
+        <section class="panel arraylist-panel">
+          <div class="panel-title">
+            <div style="display:flex;align-items:center;gap:10px;">
+              📋ARRAYLIST<small id="array-size">(0 items)</small>
+            </div>
+            <div class="sort-buttons">
+              <button id="sort-slot">SORT: SLOT</button>
+              <button id="sort-time">SORT: TIME</button>
+              <button id="traverse">TRAVERSE</button>
+            </div>
+          </div>
+
+          <div id="arraylist-empty" class="empty-state">
+            <div class="empty-icon">
+              <svg width="60" height="60" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="8" y="8" width="48" height="48" rx="8" fill="url(#arrayEmpty)" stroke="#00f0ff" stroke-width="2"/>
+                <path d="M20 28h24M20 36h16" stroke="#00f0ff" stroke-width="2" stroke-linecap="round"/>
+                <defs>
+                  <linearGradient id="arrayEmpty" x1="8" y1="8" x2="56" y2="56">
+                    <stop offset="0%" stop-color="rgba(0,100,180,0.4)"/>
+                    <stop offset="100%" stop-color="rgba(0,40,100,0.2)"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+            <div class="empty-title">ArrayList is empty</div>
+            <div class="empty-subtitle">No reservations yet</div>
+          </div>
+          <div id="arraylist-items" class="list" style="display:none;"></div>
+
+          <div class="operations-info">
+            Operations: INSERT O(1) • DELETE O(n) • SEARCH O(n) • SORT O(n log n)
+          </div>
+        </section>
+
+        <section class="panel search-panel">
+          <div class="panel-title">🔍 SEARCH OPERATION</div>
+          <div class="search-row">
+            <input id="search-input" placeholder="Search by plate number or slot number..." />
+            <button id="search-btn">SEARCH</button>
+          </div>
+          <div id="search-result" class="search-result"></div>
+        </section>
+      </div>
+
+      <section class="panel queue-panel">
+        <div class="panel-title">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M2 10h16M14 6l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            QUEUE - FIFO <small id="queue-size">(0 waiting)</small>
+          </div>
+        </div>
+
+        <div class="algorithm-box">
+          <div class="algorithm-label">ALGORITHM:  First-In-First-Out (FIFO)</div>
+          <div class="algorithm-desc">When a slot becomes available, the first person in the queue (front) is automatically assigned.</div>
+        </div>
+
+        <div id="queue-empty" class="empty-state">
+          <div class="empty-icon">🎯</div>
+          <div class="empty-title">Queue is empty</div>
+          <div class="empty-subtitle">No one waiting</div>
+        </div>
+
+        <div id="queue-items" class="list queue-list" style="display:none;"></div>
+
+        <div class="operations-info">
+          Operations: ENQUEUE O(1) • DEQUEUE O(1) • PEEK O(1)
+        </div>
+      </section>
+    </div>
+
+    <section class="ds-implementation-panel">
+      <div class="ds-header">
+        <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+          <defs>
+            <linearGradient id="iconBg" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#667eea"/>
+              <stop offset="100%" stop-color="#764ba2"/>
+            </linearGradient>
+          </defs>
+          <rect x="2" y="2" width="28" height="28" rx="6" fill="url(#iconBg)"/>
+          <rect x="8" y="16" width="4" height="10" fill="#4ade80" rx="1"/>
+          <rect x="14" y="11" width="4" height="15" fill="#fbbf24" rx="1"/>
+          <rect x="20" y="14" width="4" height="12" fill="#f87171" rx="1"/>
+        </svg>
+        DATA STRUCTURES IMPLEMENTATION
+      </div>
+      
+      <div class="ds-grid">
+        <div class="ds-box arraylist-ds">
+          <div class="ds-box-header">
+            <span class="ds-number">1</span>
+            ARRAYLIST
+          </div>
+          <div class="ds-content">
+            <div class="ds-purpose">
+              <strong>Purpose:</strong> Stores all <span class="highlight-count">0</span> active reservations
+            </div>
+            <div class="ds-operations">
+              <strong>Operations:</strong> Insert (add), Delete (remove), Search O(n), Sort, Traverse
+            </div>
+            <div class="ds-data">
+              <strong>Data:</strong> <code>[plate, slot, time]</code>
+            </div>
+          </div>
+        </div>
+
+        <div class="ds-box queue-ds">
+          <div class="ds-box-header">
+            <span class="ds-number">2</span>
+            QUEUE (FIFO)
+          </div>
+          <div class="ds-content">
+            <div class="ds-purpose">
+              <strong>Purpose:</strong> Manages <span class="highlight-count-queue">0</span> waiting users when parking is full
+            </div>
+            <div class="ds-operations">
+              <strong>Operations:</strong> Enqueue (add to rear), Dequeue (remove from front)
+            </div>
+            <div class="ds-data">
+              <strong>FIFO:</strong> First In, First Out
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

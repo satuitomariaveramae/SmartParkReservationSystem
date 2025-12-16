@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartPark Digital Sticker</title>
+    <link rel="stylesheet" href="sticker-style.css">
+</head>
+<body>
+    <div class="parking-bg"></div>
+
+    <a href="index.html" class="close-btn">✕</a>
+
+    <div class="sticker-container">
+    <div class="header">
+      <span class="lightning">⚡</span>
+      <div class="brand-name">SMARTPARK</div>
+      <span class="lightning">⚡</span>
+    </div>
+    
+    <div class="subtitle">Digital Parking Sticker</div>
+    
+    <div class="code-panel">
+      <div class="code-label"># STICKER CODE</div>
+      <div class="code-value">SP-LOADING...</div>
+    </div>
+    
+    <div class="qr-container">
+      <div id="qrcode"></div>
+    </div>
+    
+    <div class="info-grid">
+      <div class="info-box">
+        <div class="info-label">🚗 PLATE</div>
+        <div class="info-value">--</div>
+      </div>
+      <div class="info-box pink">
+        <div class="info-label">📍 SLOT</div>
+        <div class="info-value">--</div>
+      </div>
+    </div>
+    
+    <div class="reserved-box">
+      <div class="reserved-label">🕐 RESERVED AT</div>
+      <div class="reserved-time">--/--/----, --:--:-- --</div>
+    </div>
+    
+    <div class="button-grid">
+      <button class="action-btn btn-save">
+        <span>⬇</span> SAVE
+      </button>
+      <button class="action-btn btn-share">
+        <span>📤</span> SHARE
+      </button>
+    </div>
+    
+    <div class="footer">
+      🔒 KEEP THIS STICKER FOR ENTRY/EXIT VERIFICATION
+    </div>
+    
+    <div class="scan-note">
+      ⚡ SCAN QR CODE AT PARKING ENTRANCE ⚡
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <script>
+    function initSticker() {
+      const stickerData = localStorage.getItem('currentSticker');
+      
+      if(stickerData){
+        const data = JSON.parse(stickerData);
+        
+        document.querySelector('.code-value').textContent = data.code;
+        document.querySelectorAll('.info-value')[0].textContent = data.plate;
+        document.querySelectorAll('.info-value')[1].textContent = data.slot;
+        document.querySelector('.reserved-time').textContent = data.time;
+        
+        const qrcodeElement = document.getElementById('qrcode');
+        qrcodeElement.innerHTML = '';
+        
+        if (typeof QRCode !== 'undefined') {
+          new QRCode(qrcodeElement, {
+            text: data.code,
+            width: 140,
+            height: 140,
+            colorDark: '#000000',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.H
+          });
+        } else {
+          qrcodeElement.innerHTML = '<div style="width:140px;height:140px;background:#fff;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#000;font-weight:800;text-align:center;padding:10px;font-size:11px;">QR CODE<br>' + data.code + '</div>';
+        }
+      } else {
+        document.querySelector('.code-value').textContent = 'NO DATA FOUND';
+      }
+      
+      const saveBtn = document.querySelector('.btn-save');
+      const shareBtn = document.querySelector('.btn-share');
+
+      if (saveBtn) {
+        saveBtn.addEventListener('click', () => {
+          alert('✅ Parking sticker saved to your device!');
+        });
+      }
+
+      if (shareBtn) {
+        shareBtn.addEventListener('click', () => {
+          alert('📤 Share functionality would open here!');
+        });
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initSticker);
+    } else {
+      initSticker();
+    }
+
+    window.addEventListener('load', () => {
+      setTimeout(initSticker, 100);
+    });
+  </script>
+</body>
+</html>
